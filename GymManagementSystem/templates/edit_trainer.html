@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Trainer - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Edit Trainer: {{ trainer.name }}</h1>
+    
+    <form method="POST" class="form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" value="{{ trainer.name }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ trainer.email or '' }}">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="specialization">Specialization *</label>
+                <input type="text" id="specialization" name="specialization" value="{{ trainer.specialization }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contact_no">Contact Number *</label>
+                <input type="tel" id="contact_no" name="contact_no" value="{{ trainer.contact_no }}" required>
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="shift_time">Shift Time *</label>
+                <select id="shift_time" name="shift_time" required>
+                    <option value="6 AM - 12 PM" {% if trainer.shift_time == '6 AM - 12 PM' %}selected{% endif %}>6 AM - 12 PM</option>
+                    <option value="12 PM - 6 PM" {% if trainer.shift_time == '12 PM - 6 PM' %}selected{% endif %}>12 PM - 6 PM</option>
+                    <option value="6 PM - 10 PM" {% if trainer.shift_time == '6 PM - 10 PM' %}selected{% endif %}>6 PM - 10 PM</option>
+                    <option value="Full Time" {% if trainer.shift_time == 'Full Time' %}selected{% endif %}>Full Time</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Trainer</button>
+            <a href="{{ url_for('trainers_list') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

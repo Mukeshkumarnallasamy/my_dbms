@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>Welcome to Gym Management Dashboard</h1>
+    <p class="subtitle">Hello, {{ session.get('admin_name') }}! Here's your gym overview.</p>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3>Total Members</h3>
+                <p class="stat-number">{{ total_members }}</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">🏋️</div>
+            <div class="stat-content">
+                <h3>Total Trainers</h3>
+                <p class="stat-number">{{ total_trainers }}</p>
+            </div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-content">
+                <h3>Total Revenue</h3>
+                <p class="stat-number">${{ "%.2f"|format(total_payments) }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="recent-section">
+        <h2>Recent Members</h2>
+        {% if recent_members %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Goal</th>
+                    <th>Join Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in recent_members %}
+                <tr>
+                    <td>{{ member.member_id }}</td>
+                    <td>{{ member.name }}</td>
+                    <td>{{ member.goal }}</td>
+                    <td>{{ member.join_date }}</td>
+                    <td>
+                        <a href="{{ url_for('view_member', member_id=member.member_id) }}" class="btn btn-sm btn-info">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-data">No members yet. <a href="{{ url_for('add_member') }}">Add first member</a></p>
+        {% endif %}
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{{ url_for('add_member') }}" class="btn btn-primary">+ Add Member</a>
+        <a href="{{ url_for('add_trainer') }}" class="btn btn-primary">+ Add Trainer</a>
+        <a href="{{ url_for('add_workout_plan') }}" class="btn btn-primary">+ Add Workout Plan</a>
+    </div>
+</div>
+{% endblock %}

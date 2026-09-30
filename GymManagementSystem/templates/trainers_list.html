@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Trainers - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Trainers Management</h1>
+    <a href="{{ url_for('add_trainer') }}" class="btn btn-primary">+ Add New Trainer</a>
+</div>
+
+{% if trainers %}
+<div class="trainer-cards">
+    {% for trainer in trainers %}
+    <div class="card trainer-card">
+        <div class="card-header">
+            <h3>{{ trainer.name }}</h3>
+            <span class="badge">{{ trainer.specialization }}</span>
+        </div>
+        <div class="card-body">
+            <table class="info-table">
+                <tr><td><strong>ID:</strong></td><td>{{ trainer.trainer_id }}</td></tr>
+                <tr><td><strong>Email:</strong></td><td>{{ trainer.email or 'N/A' }}</td></tr>
+                <tr><td><strong>Contact:</strong></td><td>{{ trainer.contact_no }}</td></tr>
+                <tr><td><strong>Shift Time:</strong></td><td>{{ trainer.shift_time }}</td></tr>
+                <tr><td><strong>Members:</strong></td><td>{{ trainer.members|length }}</td></tr>
+            </table>
+        </div>
+        <div class="card-actions">
+            <a href="{{ url_for('edit_trainer', trainer_id=trainer.trainer_id) }}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{{ url_for('delete_trainer', trainer_id=trainer.trainer_id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-data-container">
+    <p>No trainers found. <a href="{{ url_for('add_trainer') }}">Add your first trainer</a></p>
+</div>
+{% endif %}
+{% endblock %}

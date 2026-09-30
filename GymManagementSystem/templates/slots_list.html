@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Available Slots - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Available Training Slots</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if slots %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Slot Name</th>
+                                        <th>Trainer</th>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Capacity</th>
+                                        <th>Booked</th>
+                                        <th>Available</th>
+                                        <th>Description</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in slots %}
+                                        {% set booked_count = slot.bookings|selectattr('status', 'equalto', 'Confirmed')|list|length %}
+                                        {% set available = slot.capacity - booked_count %}
+                                        <tr>
+                                            <td><strong>{{ slot.slot_name }}</strong></td>
+                                            <td>{{ slot.trainer.name }}</td>
+                                            <td>{{ slot.day_of_week }}</td>
+                                            <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+                                            <td>{{ slot.capacity }}</td>
+                                            <td>{{ booked_count }}</td>
+                                            <td>
+                                                {% if available > 0 %}
+                                                    <span class="badge bg-success">{{ available }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Full</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ slot.description or 'N/A' }}</td>
+                                            <td>
+                                                {% if available > 0 and 'member_id' in session %}
+                                                    <form action="{{ url_for('book_slot', slot_id=slot.slot_id) }}" method="POST" style="display: inline;">
+                                                        <button type="submit" class="btn btn-sm btn-success">Book Now</button>
+                                                    </form>
+                                                {% elif 'member_id' not in session %}
+                                                    <a href="{{ url_for('login') }}" class="btn btn-sm btn-warning">Login to Book</a>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Slot Full</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center py-5">
+                            <h5>No slots available at the moment</h5>
+                            <p>Please check back later for new slots.</p>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        {% if 'member_id' in session %}
+                            <a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">← Back to Dashboard</a>
+                        {% elif 'trainer_id' in session %}
+                            <a href="{{ url_for('trainer_dashboard') }}" class="btn btn-primary">← Back to Dashboard</a>
+                        {% elif 'admin_id' in session %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary">← Back to Dashboard</a>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn btn-primary">← Back to Login</a>
+                        {% endif %}
+                        <a href="{{ url_for('add_slot') }}" class="btn btn-success" style="{% if 'admin_id' not in session and 'trainer_id' not in session %}display: none;{% endif %}">+ Create New Slot</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

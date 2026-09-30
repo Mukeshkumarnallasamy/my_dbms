@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Workout Plans - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Workout Plans Management</h1>
+    <a href="{{ url_for('add_workout_plan') }}" class="btn btn-primary">+ Add New Plan</a>
+</div>
+
+{% if plans %}
+<div class="plan-cards">
+    {% for plan in plans %}
+    <div class="card plan-card">
+        <div class="card-header">
+            <h3>{{ plan.goal }}</h3>
+        </div>
+        <div class="card-body">
+            <p><strong>Description:</strong> {{ plan.description }}</p>
+            <p><strong>Duration:</strong> {{ plan.duration }}</p>
+            <small class="text-muted">Created: {{ plan.created_at.date() }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="no-data-container">
+    <p>No workout plans found. <a href="{{ url_for('add_workout_plan') }}">Create your first plan</a></p>
+</div>
+{% endif %}
+{% endblock %}

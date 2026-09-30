@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}View Member - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="member-view">
+    <div class="member-header">
+        <h1>{{ member.name }}</h1>
+        <div class="member-actions">
+            <a href="{{ url_for('edit_member', member_id=member.member_id) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ url_for('members_list') }}" class="btn btn-secondary">Back</a>
+        </div>
+    </div>
+    
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>Personal Information</h3>
+            <table class="info-table">
+                <tr><td><strong>Member ID:</strong></td><td>{{ member.member_id }}</td></tr>
+                <tr><td><strong>Gender:</strong></td><td>{{ member.gender }}</td></tr>
+                <tr><td><strong>Contact:</strong></td><td>{{ member.contact_no }}</td></tr>
+                <tr><td><strong>Join Date:</strong></td><td>{{ member.join_date }}</td></tr>
+                <tr><td><strong>Fitness Goal:</strong></td><td><span class="badge">{{ member.goal }}</span></td></tr>
+                <tr><td><strong>Health Issues:</strong></td><td>{{ member.health_issue }}</td></tr>
+            </table>
+        </div>
+        
+        <div class="info-card">
+            <h3>Physical Attributes</h3>
+            <table class="info-table">
+                <tr><td><strong>Weight:</strong></td><td>{{ member.weight }} kg</td></tr>
+                <tr><td><strong>Height:</strong></td><td>{{ member.height }} cm</td></tr>
+                <tr><td><strong>BMI:</strong></td><td>{{ "%.2f"|format(member.calculate_bmi()) }}</td></tr>
+                {% if member.trainer %}
+                <tr><td><strong>Trainer:</strong></td><td>{{ member.trainer.name }}</td></tr>
+                <tr><td><strong>Trainer Specialization:</strong></td><td>{{ member.trainer.specialization }}</td></tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
+    
+    <div class="section-tabs">
+        <h2>Member Records</h2>
+        
+        <div class="tabs">
+            <button class="tab-button active" onclick="showTab('progress')">Progress</button>
+            <button class="tab-button" onclick="showTab('attendance')">Attendance</button>
+            <button class="tab-button" onclick="showTab('payments')">Payments</button>
+            <button class="tab-button" onclick="showTab('diet')">Diet Plan</button>
+        </div>
+        
+        <div id="progress" class="tab-content active">
+            <div class="tab-header">
+                <h3>Progress Tracking</h3>
+                <a href="{{ url_for('add_progress', member_id=member.member_id) }}" class="btn btn-sm btn-primary">+ Add Progress</a>
+            </div>
+            {% if progress %}
+            <table class="table">
+                <thead>
+                    <tr><th>Date</th><th>Weight (kg)</th><th>BMI</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    {% for p in progress|reverse %}
+                    <tr>
+                        <td>{{ p.date }}</td>
+                        <td>{{ p.weight }}</td>
+                        <td>{{ "%.2f"|format(p.bmi) }}</td>
+                        <td>{{ p.notes or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No progress records yet.</p>
+            {% endif %}
+        </div>
+        
+        <div id="attendance" class="tab-content">
+            <div class="tab-header">
+                <h3>Attendance</h3>
+                <a href="{{ url_for('add_attendance', member_id=member.member_id) }}" class="btn btn-sm btn-primary">+ Record Attendance</a>
+            </div>
+            {% if attendance %}
+            <table class="table">
+                <thead>
+                    <tr><th>Date</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {% for a in attendance|reverse %}
+                    <tr>
+                        <td>{{ a.date }}</td>
+                        <td><span class="badge badge-{{ a.status|lower }}">{{ a.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No attendance records yet.</p>
+            {% endif %}
+        </div>
+        
+        <div id="payments" class="tab-content">
+            <div class="tab-header">
+                <h3>Payments</h3>
+                <a href="{{ url_for('add_payment', member_id=member.member_id) }}" class="btn btn-sm btn-primary">+ Add Payment</a>
+            </div>
+            {% if payments %}
+            <table class="table">
+                <thead>
+                    <tr><th>Date</th><th>Amount</th><th>Status</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    {% for pay in payments|reverse %}
+                    <tr>
+                        <td>{{ pay.payment_date }}</td>
+                        <td>${{ "%.2f"|format(pay.amount) }}</td>
+                        <td><span class="badge badge-{{ pay.status|lower }}">{{ pay.status }}</span></td>
+                        <td>{{ pay.notes or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No payment records yet.</p>
+            {% endif %}
+        </div>
+        
+        <div id="diet" class="tab-content">
+            <div class="tab-header">
+                <h3>Diet Plans</h3>
+                <a href="{{ url_for('add_diet', member_id=member.member_id) }}" class="btn btn-sm btn-primary">+ Add Diet Plan</a>
+            </div>
+            {% if diet %}
+            <div class="diet-cards">
+                {% for d in diet|reverse %}
+                <div class="card">
+                    <strong>{{ d.meal_type }}</strong>
+                    <p><strong>Goal:</strong> {{ d.goal }}</p>
+                    <p><strong>Items:</strong> {{ d.items }}</p>
+                    <small>{{ d.created_at.date() }}</small>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p>No diet plans yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function showTab(tabName) {
+    var i, tabcontent, tabbuttons;
+    tabcontent = document.getElementsByClassName("tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].classList.remove("active");
+    }
+    tabbuttons = document.getElementsByClassName("tab-button");
+    for (i = 0; i < tabbuttons.length; i++) {
+        tabbuttons[i].classList.remove("active");
+    }
+    document.getElementById(tabName).classList.add("active");
+    event.currentTarget.classList.add("active");
+}
+</script>
+{% endblock %}

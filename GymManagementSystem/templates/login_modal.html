@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Login to Gym Management System</h3>
+                </div>
+                <div class="card-body p-5">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('login') }}">
+                        <div class="mb-4">
+                            <label for="user_type" class="form-label fw-bold">Login As:</label>
+                            <select class="form-select form-select-lg" id="user_type" name="user_type" required>
+                                <option value="admin">Admin</option>
+                                <option value="member">Member</option>
+                                <option value="trainer">Trainer</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username:</label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" required placeholder="Enter your username">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="form-label">Password:</label>
+                            <input type="password" class="form-control form-control-lg" id="password" name="password" required placeholder="Enter your password">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">Login</button>
+                    </form>
+
+                    <hr>
+                    
+                    <div class="text-center">
+                        <p class="text-muted mb-3">Don't have an account?</p>
+                        <a href="{{ url_for('register_member') }}" class="btn btn-outline-primary btn-sm w-100 mb-2">Register as Member</a>
+                        <a href="{{ url_for('register_trainer') }}" class="btn btn-outline-success btn-sm w-100">Register as Trainer</a>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <p class="small text-muted mb-2"><strong>Demo Credentials:</strong></p>
+                        <p class="small mb-1">Admin - Username: <code>admin</code> | Password: <code>admin123</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

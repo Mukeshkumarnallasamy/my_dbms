@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}My Bookings - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">My Slot Bookings</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Slot Name</th>
+                                        <th>Trainer</th>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Booked On</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in bookings %}
+                                        <tr>
+                                            <td><strong>{{ booking.slot.slot_name }}</strong></td>
+                                            <td>{{ booking.slot.trainer.name }}</td>
+                                            <td>{{ booking.slot.day_of_week }}</td>
+                                            <td>{{ booking.slot.start_time }} - {{ booking.slot.end_time }}</td>
+                                            <td>{{ booking.booking_date.strftime('%d %b %Y %H:%M') }}</td>
+                                            <td>
+                                                {% if booking.status == 'Confirmed' %}
+                                                    <span class="badge bg-success">✅ Confirmed</span>
+                                                {% elif booking.status == 'Cancelled' %}
+                                                    <span class="badge bg-danger">❌ Cancelled</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">{{ booking.status }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if booking.status == 'Confirmed' %}
+                                                    <form action="{{ url_for('cancel_booking', booking_id=booking.booking_id) }}" method="POST" style="display: inline;">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Cancel this booking?');">Cancel</button>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center py-5">
+                            <h5>No bookings yet</h5>
+                            <p>Browse available slots and make your first booking!</p>
+                            <a href="{{ url_for('slots_list') }}" class="btn btn-primary mt-3">View Available Slots</a>
+                        </div>
+                    {% endif %}
+
+                    <div class="mt-4">
+                        <a href="{{ url_for('member_dashboard') }}" class="btn btn-primary">← Back to Dashboard</a>
+                        <a href="{{ url_for('slots_list') }}" class="btn btn-success">📅 View Available Slots</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

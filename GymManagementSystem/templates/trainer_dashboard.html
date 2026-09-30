@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Trainer Dashboard - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-5">Welcome, {{ trainer.name }}! 💪</h1>
+            <p class="text-muted">Trainer ID: {{ trainer.trainer_id }} | Specialization: {{ trainer.specialization }} | Shift: {{ trainer.shift_time }}</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">My Members</h6>
+                    <h2>{{ members|length }}</h2>
+                    <small>Assigned members</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Active Slots</h6>
+                    <h2>{{ slots|length }}</h2>
+                    <small>Available slots</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Contact</h6>
+                    <h6>{{ trainer.contact_no }}</h6>
+                    <small>Phone</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Email</h6>
+                    <h6>{{ trainer.email }}</h6>
+                    <small>Contact</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- My Members -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Members</h5>
+                    <span class="badge bg-light text-primary">{{ members|length }}</span>
+                </div>
+                <div class="card-body">
+                    {% if members %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Goal</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for member in members %}
+                                        <tr>
+                                            <td>{{ member.name }}</td>
+                                            <td>{{ member.goal }}</td>
+                                            <td>
+                                                <a href="{{ url_for('trainer_add_attendance', member_id=member.member_id) }}" class="btn btn-sm btn-info" title="Mark Attendance">📋</a>
+                                                <a href="{{ url_for('trainer_assign_diet', member_id=member.member_id) }}" class="btn btn-sm btn-success" title="Assign Diet">🍎</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No members assigned yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My Slots -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">My Training Slots</h5>
+                    <a href="{{ url_for('add_slot') }}" class="btn btn-sm btn-light">+ Add Slot</a>
+                </div>
+                <div class="card-body">
+                    {% if slots %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Slot Name</th>
+                                        <th>Day</th>
+                                        <th>Time</th>
+                                        <th>Capacity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slot in slots %}
+                                        <tr>
+                                            <td>{{ slot.slot_name }}</td>
+                                            <td>{{ slot.day_of_week }}</td>
+                                            <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+                                            <td>{{ slot.bookings|length }} / {{ slot.capacity }}</td>
+                                            <td>
+                                                <a href="{{ url_for('edit_slot', slot_id=slot.slot_id) }}" class="btn btn-sm btn-warning">✏️</a>
+                                                <a href="{{ url_for('delete_slot', slot_id=slot.slot_id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this slot?');">🗑️</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No slots created yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('add_slot') }}" class="btn btn-primary me-2">➕ Create New Slot</a>
+                    <a href="{{ url_for('slots_list') }}" class="btn btn-info me-2">📅 View All Slots</a>
+                    <a href="{{ url_for('members_list') }}" class="btn btn-success me-2">👥 View All Members</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

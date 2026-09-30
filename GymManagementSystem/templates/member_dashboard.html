@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Member Dashboard - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1 class="display-5">Welcome, {{ member.name }}! 🏋️</h1>
+            <p class="text-muted">Member ID: {{ member.member_id }} | Joined: {{ member.join_date.strftime('%d %b %Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Attendance</h6>
+                    <h2>{{ attendance|length }}</h2>
+                    <small>Sessions attended</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Diet Plans</h6>
+                    <h2>{{ diet|length }}</h2>
+                    <small>Active plans</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Progress Logs</h6>
+                    <h2>{{ progress|length }}</h2>
+                    <small>Recorded entries</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h6 class="card-title">Notifications</h6>
+                    <h2>{{ notifications|length }}</h2>
+                    <small>Unread updates</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- My Profile & Trainer -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">My Profile</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Name:</strong> {{ member.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Age:</strong> {% if member.dob %} ~{{ ((now.date() - member.dob).days // 365) }} years {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Weight:</strong> {{ member.weight }} kg
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Height:</strong> {{ member.height }} cm
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>BMI:</strong> {{ member.calculate_bmi() }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Goal:</strong> {{ member.goal }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong>Health Issues:</strong> {{ member.health_issue }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Trainer -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Assigned Trainer</h5>
+                </div>
+                <div class="card-body">
+                    {% if member.trainer %}
+                        <div class="mb-3">
+                            <strong>Name:</strong> {{ member.trainer.name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Specialization:</strong> {{ member.trainer.specialization }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Contact:</strong> {{ member.trainer.contact_no }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Email:</strong> {{ member.trainer.email }}
+                        </div>
+                        <div>
+                            <strong>Shift Time:</strong> {{ member.trainer.shift_time }}
+                        </div>
+                    {% else %}
+                        <p class="text-warning">❌ No trainer assigned yet. Contact admin to get assigned a trainer.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Attendance -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Recent Attendance (Last 10)</h5>
+                </div>
+                <div class="card-body">
+                    {% if attendance %}
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in attendance %}
+                                    <tr>
+                                        <td>{{ record.date.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            {% if record.status == 'Present' %}
+                                                <span class="badge bg-success">Present</span>
+                                            {% elif record.status == 'Absent' %}
+                                                <span class="badge bg-danger">Absent</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">{{ record.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No attendance records yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Payments -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Payment History (Last 5)</h5>
+                </div>
+                <div class="card-body">
+                    {% if payments %}
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                    <tr>
+                                        <td>{{ payment.payment_date.strftime('%d %b %Y') }}</td>
+                                        <td>${{ payment.amount }}</td>
+                                        <td>
+                                            {% if payment.status == 'Paid' %}
+                                                <span class="badge bg-success">Paid</span>
+                                            {% elif payment.status == 'Pending' %}
+                                                <span class="badge bg-warning">Pending</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">{{ payment.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="text-muted">No payment records yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('slots_list') }}" class="btn btn-primary me-2">📅 View & Book Slots</a>
+                    <a href="{{ url_for('bookings_list') }}" class="btn btn-success me-2">✅ My Bookings</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-danger">🚪 Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const now = new Date();
+</script>
+{% endblock %}

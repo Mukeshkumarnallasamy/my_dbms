@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Slot - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h3 class="mb-0">Edit Training Slot</h3>
+                </div>
+                <div class="card-body p-5">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form method="POST" action="{{ url_for('edit_slot', slot_id=slot.slot_id) }}">
+                        <div class="mb-3">
+                            <label for="slot_name" class="form-label">Slot Name:</label>
+                            <input type="text" class="form-control" id="slot_name" name="slot_name" value="{{ slot.slot_name }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Trainer:</label>
+                            <input type="text" class="form-control" disabled value="{{ slot.trainer.name }} - {{ slot.trainer.specialization }}">
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="day_of_week" class="form-label">Day of Week:</label>
+                                <select class="form-select" id="day_of_week" name="day_of_week" required>
+                                    {% for day in days %}
+                                        <option value="{{ day }}" {% if day == slot.day_of_week %}selected{% endif %}>{{ day }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="capacity" class="form-label">Capacity (Members):</label>
+                                <input type="number" class="form-control" id="capacity" name="capacity" value="{{ slot.capacity }}" min="1" max="100" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="start_time" class="form-label">Start Time:</label>
+                                <input type="time" class="form-control" id="start_time" name="start_time" value="{{ slot.start_time }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="end_time" class="form-label">End Time:</label>
+                                <input type="time" class="form-control" id="end_time" name="end_time" value="{{ slot.end_time }}" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description:</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ slot.description or '' }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning btn-lg w-100 mb-2">Update Slot</button>
+                        <a href="{{ url_for('slots_list') }}" class="btn btn-outline-secondary btn-lg w-100">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

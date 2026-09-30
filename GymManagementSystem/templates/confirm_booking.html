@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Booking - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Confirm Slot Booking</h3>
+                </div>
+                <div class="card-body p-5">
+                    <div class="mb-4 p-4 bg-light rounded">
+                        <h4 class="mb-3">{{ slot.slot_name }}</h4>
+                        <div class="mb-3">
+                            <strong>Trainer:</strong> {{ slot.trainer.name }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Specialization:</strong> {{ slot.trainer.specialization }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Day:</strong> {{ slot.day_of_week }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Time:</strong> {{ slot.start_time }} - {{ slot.end_time }}
+                        </div>
+                        <div class="mb-3">
+                            <strong>Location Capacity:</strong> {{ slot.capacity }} members
+                        </div>
+                        {% if slot.description %}
+                            <div class="mb-3">
+                                <strong>Description:</strong> {{ slot.description }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <strong>Trainer Contact:</strong> {{ slot.trainer.contact_no }}
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('book_slot', slot_id=slot.slot_id) }}">
+                        <div class="alert alert-info">
+                            <h6 class="mb-2">📋 Booking Details:</h6>
+                            <p class="mb-0">You are booking this slot. A confirmation notification will be sent to you.</p>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 mb-2">✅ Confirm Booking</button>
+                        <a href="{{ url_for('slots_list') }}" class="btn btn-outline-secondary btn-lg w-100">❌ Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gym Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo">💪 GymPro</div>
+            {% if session.get('admin_id') %}
+            <div class="nav-links">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Dashboard</a>
+                <a href="{{ url_for('members_list') }}" class="nav-link">Members</a>
+                <a href="{{ url_for('trainers_list') }}" class="nav-link">Trainers</a>
+                <a href="{{ url_for('workout_plans_list') }}" class="nav-link">Workout Plans</a>
+                <a href="{{ url_for('logout') }}" class="nav-link logout">Logout ({{ session.get('admin_name') }})</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                        <span class="close" onclick="this.parentElement.style.display='none';">&times;</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2026 Gym Management System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

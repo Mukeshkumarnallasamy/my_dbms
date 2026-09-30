@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Diet Plan - Gym Management System{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Assign Diet Plan</h3>
+                </div>
+                <div class="card-body p-5">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'danger' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="mb-4 p-3 bg-light rounded">
+                        <strong>Member:</strong> {{ member.name }}<br>
+                        <strong>Goal:</strong> {{ member.goal }}
+                    </div>
+
+                    <form method="POST" action="{{ url_for('trainer_assign_diet', member_id=member.member_id) }}">
+                        <div class="mb-3">
+                            <label for="goal" class="form-label">Diet Goal:</label>
+                            <select class="form-select" id="goal" name="goal" required>
+                                <option value="">Select Goal</option>
+                                <option value="Weight Loss">Weight Loss</option>
+                                <option value="Weight Gain">Weight Gain</option>
+                                <option value="Muscle Building">Muscle Building</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="Strength">Strength & Power</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="meal_type" class="form-label">Meal Type:</label>
+                            <select class="form-select" id="meal_type" name="meal_type" required>
+                                <option value="">Select Meal</option>
+                                <option value="Breakfast">Breakfast</option>
+                                <option value="Mid-Morning Snack">Mid-Morning Snack</option>
+                                <option value="Lunch">Lunch</option>
+                                <option value="Afternoon Snack">Afternoon Snack</option>
+                                <option value="Dinner">Dinner</option>
+                                <option value="Post-Workout">Post-Workout</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="items" class="form-label">Diet Items & Instructions:</label>
+                            <textarea class="form-control" id="items" name="items" rows="5" placeholder="List food items and preparation instructions..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg w-100 mb-2">Assign Diet Plan</button>
+                        <a href="{{ url_for('trainer_dashboard') }}" class="btn btn-outline-secondary btn-lg w-100">Back</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
